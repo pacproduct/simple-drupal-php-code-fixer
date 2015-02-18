@@ -15,7 +15,7 @@ main($files_to_include_regexp, $files_to_exclude_regexp);
 function display_help() {
   echo "Should be used as follows:\n";
   echo "php " . $_SERVER['argv'][0] . " <input file or directory to be processed recursively> [dry-run]\n";
-  echo "If dry-run is specified, the result is be outputted, but the file doesn't get modified.";
+  echo "If dry-run is specified, the result is be outputted, but the file doesn't get modified.\n";
 }
 
 /**
