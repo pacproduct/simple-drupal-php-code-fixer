@@ -1,13 +1,30 @@
 <?php
 
 // Settings.
-// File types to match and process (regexp).
-$files_to_include_regexp = '/^.*(\.php|\.inc|\.module|\.install|\.js)$/';
-// Items matching this regexp will be ignored.
-$files_to_exclude_regexp = ':(^|.*/).git/.*:';
+// Array of regexps for selecting files/paths to process. Files/Paths matching
+// any following regexps will be included in the list of files to be processed.
+$files_to_include_regexps = array('/^.*(\.php|\.inc|\.module|\.theme|\.install|\.js)$/');
+// Array of regexps for excluding files/paths. Files/Paths matching any
+// following regexps will be excluded from the list of files to be processed.
+// Has priority over the previous parameter.
+$files_to_exclude_regexps = array(
+  ':.*/.git/.*:',
+  ':^.git/.*:',
+  ':.*default\.inc.*:',
+  ':.*jquery.*:',
+  ':.*panelizer\.inc.*:',
+  ':.*\.features\..*:',
+  ':.*\.min\.js.*:',
+  ':.*strongarm\.inc.*:',
+  ':.*App\.js.*:',
+  ':.*getid3.*:',
+  ':.*phpseclib.*:',
+  ':.*fpdf16.*:',
+  ':.*rml_tracked_return_retailer/classes/proxy.*:',
+);
 
 // Go.
-main($files_to_include_regexp, $files_to_exclude_regexp);
+main($files_to_include_regexps, $files_to_exclude_regexps);
 
 /**
  * Displays a help message on how to use this script.
@@ -21,12 +38,12 @@ function display_help() {
 /**
  * Main function.
  *
- * @param string $files_to_include_regexp
- *   Regexp filtering accepted files.
- * @param string $files_to_exclude_regexp
- *   Regexp excluding files. Has priority over the previous parameter.
+ * @param array $files_to_include_regexps
+ *   Regexps filtering accepted files.
+ * @param array $files_to_exclude_regexps
+ *   Regexps excluding files. Has priority over the previous parameter.
  */
-function main($files_to_include_regexp, $files_to_exclude_regexp) {
+function main($files_to_include_regexps, $files_to_exclude_regexps) {
   // Start timer.
   $start_time = microtime(true);
   
@@ -60,7 +77,7 @@ function main($files_to_include_regexp, $files_to_exclude_regexp) {
 
     // Retrieve files.
     foreach ($iter as $path => $item) {
-      if (!$item->isDir() && preg_match($files_to_include_regexp, $path) && !preg_match($files_to_exclude_regexp, $path)) {
+      if (!$item->isDir() && _should_file_be_processed($path, $files_to_include_regexps, $files_to_exclude_regexps)) {
         $paths[] = $path;
       }
     }
@@ -89,6 +106,50 @@ function main($files_to_include_regexp, $files_to_exclude_regexp) {
   $number_minutes = round($number_seconds / 60, 2);
   echo "\n";
   echo "$number_files files processed in $number_seconds seconds ($number_minutes minutes).\n";
+}
+
+/**
+ * Helper checking whether a file should be processed or not.
+ *
+ * Does that based on given configuration arrays of regexps.
+ *
+ * @param array $files_to_include_regexps
+ *   Regexps filtering accepted files.
+ * @param array $files_to_exclude_regexps
+ *   Regexps excluding files. Has priority over the previous parameter.
+ *
+ * @return bool
+ *   TRUE if the file should be processed. FALSE otherwise.
+ */
+function _should_file_be_processed($file_path, $files_to_include_regexps, $files_to_exclude_regexps) {
+  // Loop over inclusion regexps until a matching one is found.
+  $file_should_be_included = FALSE;
+  foreach ($files_to_include_regexps as $regexp) {
+    if (preg_match($regexp, $file_path)) {
+      // Current path matched one of the inclusion regexp. Mark the file as
+      // potentially good to process.
+      $file_should_be_included = TRUE;
+      break;
+    }
+  }
+  
+  // If we did not flag the file as potentially good to process so far, it
+  // means we don't want it. Return FALSE.
+  if (!$file_should_be_included) {
+    return FALSE;
+  }
+  
+  // Loop over exclusion regexps until a matching one is found.
+  foreach ($files_to_exclude_regexps as $regexp) {
+    if (preg_match($regexp, $file_path)) {
+      // Current path matched one of the exclusion regexp. Return FALSE.
+      return FALSE;
+    }
+  }
+  
+  // If we reach this line, it means the file matched one of the inclusion
+  // regexps, and none of the exclusion ones. File is good to go. Return TRUE.
+  return TRUE;
 }
 
 /**
