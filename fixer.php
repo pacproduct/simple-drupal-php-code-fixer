@@ -2,7 +2,7 @@
 
 // Settings.
 // File types to match and process (regexp).
-$files_to_include_regexp = '/^.*(\.php|\.inc|\.module|\.install|\.pack)$/';
+$files_to_include_regexp = '/^.*(\.php|\.inc|\.module|\.install|\.js)$/';
 // Items matching this regexp will be ignored.
 $files_to_exclude_regexp = ':(^|.*/).git/.*:';
 
