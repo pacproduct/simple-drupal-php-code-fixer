@@ -286,15 +286,15 @@ function fix_inline_comments(&$in) {
       }
       
       // If next line is not a comment, make sure the last character is either
-      // a "?", "!" or ".".
+      // a "?", "!" or ".". We also tolerate ';' as it's usually commented out code.
       if (!$next_line_is_a_com) {
         $last_character = mb_substr($current_line, -1, NULL, 'utf-8');
         // If last char is a ':', just replace it with a '.'.
         if ($last_character == ':') {
           $current_line = mb_substr($current_line, 0, mb_strlen($current_line, 'utf-8') - 1, 'utf-8') . '.';
         }
-        // Otherwise, if last char is different from '?', '!' or '.', add a '.'.
-        elseif (!in_array($last_character, array('?', '!', '.'))) {
+        // Otherwise, if last char is different from '?', '!', '.' or ';', add a '.'.
+        elseif (!in_array($last_character, array('?', '!', '.', ';'))) {
           $current_line .= '.';
         }
       }
