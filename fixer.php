@@ -169,6 +169,7 @@ function process_file($file_path, $dry_run) {
     'fix_line_breaks',
     'fix_end_of_line_spaces',
     'fix_final_line_breaks',
+    'fix_dollariddollar_comments',
     'fix_inline_comments',
   );
 
@@ -225,6 +226,16 @@ function fix_final_line_breaks(&$in) {
   $in = preg_replace(':\n*\Z:m', '', $in);
   // Add one final line break.
   $in .= "\n";
+}
+
+/**
+ * Removes special comments "// $Id$".
+ *
+ * @param string $in
+ *   Input string to process. Will get modified as it's passed by reference.
+ */
+function fix_dollariddollar_comments(&$in) {
+  $in = preg_replace(':^\h*//\h*\$Id\$.*\n*:m', '', $in);
 }
 
 /**
