@@ -249,7 +249,7 @@ function fix_inline_comments(&$in) {
   $lines = explode("\n", $in);
   
   // Browse the whole file and spot comments to rework them.
-  $comment_regexp = ':^((\s*//)( ?))(.+)$:';
+  $comment_regexp = _get_comment_regexp();
   $prev_line_was_a_comment = FALSE;
   $num_lines = count($lines);
   for ($i = 0; $i < $num_lines; $i++) {
@@ -264,9 +264,9 @@ function fix_inline_comments(&$in) {
     }
     
     // Is current line a comment?
-    $cur_line_is_a_com = preg_match($comment_regexp, $current_line);
+    $cur_line_is_a_com = _is_comment_to_be_processed($current_line);
     // Is next line a comment?
-    $next_line_is_a_com = preg_match($comment_regexp, $next_line);
+    $next_line_is_a_com = _is_comment_to_be_processed($next_line);
 
     // Current line is a comment.
     if ($cur_line_is_a_com) {
@@ -306,6 +306,47 @@ function fix_inline_comments(&$in) {
   
   // Put all lines together again.
   $in = implode("\n", $lines);
+}
+
+/**
+ * Helper returning the common regexp used to detect and parse a comment.
+ *
+ * @return string.
+ *   Regexp used to detect a comment, and match its subparts:
+ *   - $1 contains leading spaces, "//" and the space following slashes if any.
+ *   - $2 contains leading spaces and "//".
+ *   - $3 contains ' ' if a space follows slashes, or '' otherwise.
+ *   - $4 contains the comment string.
+ */
+function _get_comment_regexp() {
+  return ':^((\h*//)( ?))(.+)$:';
+}
+
+/**
+ * Helper detecting if given line is a comment and if it should be processed.
+ *
+ * @param string $line
+ *   Line to test.
+ *
+ * @return bool
+ *   TRUE if given line appears to be a valid comment that should be processed.
+ *   FALSE otherwise.
+ */
+function _is_comment_to_be_processed($line) {
+  $comment_regexp = _get_comment_regexp();
+  
+  // If doesn't match comment format, do not process.
+  if (!preg_match($comment_regexp, $line)) {
+    return FALSE;
+  }
+  
+  // If looks like a HTML comment, do not procss.
+  if (preg_match(':^\h*//\h*-->.*$:', $line)) {
+    return FALSE;
+  }
+  
+  // Other cases should be fine to process.
+  return TRUE;
 }
 
 /**
