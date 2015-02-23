@@ -210,9 +210,9 @@ function fix_line_breaks(&$in) {
  *   Input string to process. Will get modified as it's passed by reference.
  */
 function fix_end_of_line_spaces(&$in) {
-  // Remove extra horizontal white characters (\h) from end of lines (that is
+  // Remove extra white characters (\s) from end of lines (that is
   // all white characters except new lines).
-  $in = preg_replace(':^(.*?)\h*$:m', '$1', $in);
+  $in = preg_replace(':^(.*?)\s*$:m', '$1', $in);
 }
 
 /**
@@ -236,10 +236,10 @@ function fix_final_line_breaks(&$in) {
  */
 function fix_dollariddollar_comments(&$in) {
   // Remove '// $Id$...'.
-  $in = preg_replace(':^\h*//\h*\$Id\$.*\n*:m', '', $in);
+  $in = preg_replace(':^\s*//\s*\$Id\$.*\n*:m', '', $in);
   
   // Remove '// $Id:...$'.
-  $in = preg_replace('#^\h*//\h*\$Id:.*\$\h*\n*#m', '', $in);
+  $in = preg_replace('#^\s*//\s*\$Id:.*\$\s*\n*#m', '', $in);
 }
 
 /**
@@ -294,7 +294,7 @@ function fix_inline_comments(&$in) {
       // We skip comments starting with "@" though as they could be directives like
       // @codeCoverageIgnoreStart that we should not temper with.
       preg_match($comment_regexp, $current_line, $matches);
-      $starts_with_at_sign = preg_match(':^\h*@.*$:', $matches[4]);
+      $starts_with_at_sign = preg_match(':^\s*@.*$:', $matches[4]);
       if (!$next_line_is_a_com && !$starts_with_at_sign) {
         $last_character = mb_substr($current_line, -1, NULL, 'utf-8');
         // If last char is a ':', just replace it with a '.'.
@@ -327,7 +327,7 @@ function fix_inline_comments(&$in) {
  *   - $4 contains the comment string.
  */
 function _get_comment_regexp() {
-  return ':^((\h*//)( ?))(.+)$:';
+  return ':^((\s*//)( ?))(.+)$:';
 }
 
 /**
@@ -349,7 +349,7 @@ function _is_comment_to_be_processed($line) {
   }
   
   // If looks like a HTML comment, do not procss.
-  if (preg_match(':^\h*//\h*-->.*$:', $line)) {
+  if (preg_match(':^\s*//\s*-->.*$:', $line)) {
     return FALSE;
   }
   
