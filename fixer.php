@@ -291,7 +291,7 @@ function fix_inline_comments(&$in) {
       
       // If next line is not a comment, make sure the last character is either
       // a "?", "!" or ".". We also tolerate...
-      // ; { } ,
+      // ; { } , (
       // ...as it usually denotes commented out code.
       // We skip comments starting with "@" though as they could be directives like
       // @codeCoverageIgnoreStart that we should not temper with.
@@ -304,7 +304,7 @@ function fix_inline_comments(&$in) {
           $current_line = mb_substr($current_line, 0, mb_strlen($current_line, 'utf-8') - 1, 'utf-8') . '.';
         }
         // Otherwise, if last char is different from authorised chars, add a '.'.
-        elseif (!in_array($last_character, array('?', '!', '.', ';', '{', '}', ','))) {
+        elseif (!in_array($last_character, array('?', '!', '.', ';', '{', '}', ',', '('))) {
           $current_line .= '.';
         }
       }
