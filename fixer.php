@@ -287,7 +287,11 @@ function fix_inline_comments(&$in) {
       
       // If next line is not a comment, make sure the last character is either
       // a "?", "!" or ".". We also tolerate ';' as it's usually commented out code.
-      if (!$next_line_is_a_com) {
+      // We skip comments starting with "@" though as they could be directives like
+      // @codeCoverageIgnoreStart that we should not temper with.
+      preg_match($comment_regexp, $current_line, $matches);
+      $starts_with_at_sign = preg_match(':^\h*@.*$:', $matches[4]);
+      if (!$next_line_is_a_com && !$starts_with_at_sign) {
         $last_character = mb_substr($current_line, -1, NULL, 'utf-8');
         // If last char is a ':', just replace it with a '.'.
         if ($last_character == ':') {
