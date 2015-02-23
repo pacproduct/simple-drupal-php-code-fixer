@@ -293,11 +293,13 @@ function fix_inline_comments(&$in) {
       // a "?", "!" or ".". We also tolerate...
       // ; { } , (
       // ...as it usually denotes commented out code.
-      // We skip comments starting with "@" though as they could be directives like
-      // @codeCoverageIgnoreStart that we should not temper with.
       preg_match($comment_regexp, $current_line, $matches);
+      // Skip comments starting with "@" though as they could be directives
+      // like @codeCoverageIgnoreStart that we should not temper with.
       $starts_with_at_sign = preg_match(':^[^\S\n]*@.*$:', $matches[4]);
-      if (!$next_line_is_a_com && !$starts_with_at_sign) {
+      // Skip comments ending with a URL.
+      $ends_with_url = preg_match('#(https?://)?([\da-z\.-]+)\.([a-z\.]{2,6})([/\w\.-]*)*/?$#', $matches[4]);
+      if (!$next_line_is_a_com && !$starts_with_at_sign && !$ends_with_url) {
         $last_character = mb_substr($current_line, -1, NULL, 'utf-8');
         // If last char is a ':', just replace it with a '.'.
         if ($last_character == ':') {
