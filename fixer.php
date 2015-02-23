@@ -325,10 +325,10 @@ function fix_inline_comments(&$in) {
  *   - $1 contains leading spaces, "//" and the space following slashes if any.
  *   - $2 contains leading spaces and "//".
  *   - $3 contains ' ' if a space follows slashes, or '' otherwise.
- *   - $4 contains the comment string.
+ *   - $4 contains the comment string. Could be empty.
  */
 function _get_comment_regexp() {
-  return ':^(([^\S\n]*//)( ?))(.+)$:';
+  return ':^(([^\S\n]*//)( ?))(.*)$:';
 }
 
 /**
@@ -349,7 +349,7 @@ function _is_comment_to_be_processed($line) {
     return FALSE;
   }
   
-  // If looks like a HTML comment, do not procss.
+  // If looks like a HTML comment, do not process.
   if (preg_match(':^[^\S\n]*//[^\S\n]*-->.*$:', $line)) {
     return FALSE;
   }
