@@ -235,7 +235,11 @@ function fix_final_line_breaks(&$in) {
  *   Input string to process. Will get modified as it's passed by reference.
  */
 function fix_dollariddollar_comments(&$in) {
+  // Remove '// $Id$...'.
   $in = preg_replace(':^\h*//\h*\$Id\$.*\n*:m', '', $in);
+  
+  // Remove '// $Id:...$'.
+  $in = preg_replace('#^\h*//\h*\$Id:.*\$\h*\n*#m', '', $in);
 }
 
 /**
