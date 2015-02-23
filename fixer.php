@@ -353,6 +353,15 @@ function _is_comment_to_be_processed($line) {
     return FALSE;
   }
   
+  // If it looks like an old-fashioned JS escaper, do not process.
+  // I.e.: //<![CDATA[ or //]]>.
+  if (preg_match(':^[^\S\n]*//[^\S\n]*<!\[CDATA\[.*$:', $line)) {
+    return FALSE;
+  }
+  if (preg_match(':^[^\S\n]*//[^\S\n]*\]\]>.*$:', $line)) {
+    return FALSE;
+  }
+  
   // Other cases should be fine to process.
   return TRUE;
 }
