@@ -298,7 +298,7 @@ function fix_inline_comments(&$in) {
       // like @codeCoverageIgnoreStart that we should not temper with.
       $starts_with_at_sign = preg_match(':^[^\S\n]*@.*$:', $matches[4]);
       // Skip comments ending with a URL.
-      $ends_with_url = preg_match('#(https?://)?([\da-z\.-]+)\.([a-z\.]{2,6})([/\w\.-]*)*/?$#', $matches[4]);
+      $ends_with_url = preg_match('#(https?://)([\da-z\.-]+)\.([a-z\.]{2,6})([/\w\.-]*)*/?$#', $matches[4]);
       if (!$next_line_is_a_com && !$starts_with_at_sign && !$ends_with_url && !empty($matches[4])) {
         $last_character = mb_substr($current_line, -1, NULL, 'utf-8');
         // If last char is a ':', just replace it with a '.'.
